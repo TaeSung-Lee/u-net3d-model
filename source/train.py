@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # python 2
 # Brats2015 data를 33x33x33의 3차원 이미지로 슬라이스된 이미지 데이터를 3D U-net구조의 CNN model에 학습하는 과정.
+from __future__ import print_function
 
 import os
 import time

@@ -4,6 +4,8 @@
 U-net 3d model을 구성하는 소스코드이다. 이 model은 중심 축을 기준으로 좌우 대칭의 구조를 갖고있다. 이러한 구조는
 model에 input되는 이미지의 축소, 확장을 통해 data가 갖고있는 context, precise localization을 진행한다.
 '''
+from __future__ import print_function
+
 import numpy as np
 
 from keras import backend as K
