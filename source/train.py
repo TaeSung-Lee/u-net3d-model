@@ -15,31 +15,38 @@ from metrics import dice_coefficient, dice_coefficient_loss
 from u_net3d_model import u_net3d_model
 
 output_path = input('INPUT OUTPUT PATH : ')
-model_dir_name = 'model/'
-os.makedirs(output_path + model_dir_name)
-model_path = output_path + model_dir_name
+model_path = output_path + 'model/'
+try:
+    os.makedirs(model_path)
+except OSError:
+    pass
 
 train_patch_name = output_path + 'HGG_train.pat'
 label_patch_name = output_path + 'HGG_label.pat'
-check_point = model_path + 'model_check_point.{epoch:02d}-{val_acc:.4f}.hdf5'
+
+check_point = model_path + 'model_check_point.{epoch:03d}-{val_acc:.4f}.hdf5'
 log_file = model_path + 'training.log'
 model_file = model_path + 'u_net3d_model.h5'
-tensorboard_log_file = model_path + 'tensorboard.log'
+tensorboard_log_file = model_path + 'tensorboard.log/'
+try:
+    os.makedirs(tensorboard_log_file_path)
+except OSError:
+    pass
 
 dropout_rate = 0.5
 optimizer = Adam
 initial_learning_rate = 5e-4
 output_weight = [0.34, 0.33, 0.33]
-loss_function = dice_coefficient_loss
-metrics_function = [dice_coefficient]
+loss_function = 'categorical_crossentropy'
+metrics_function = ['accuracy']
 learning_rate_drop = 0.5
 learning_rate_patience = 20
 batch_size = 30
-epochs = 10
+epochs = 100
 
-def get_callback(model_file, log_file, learning_rate_drop, learning_rate_patience, tensorboard_log_file):
+def get_callback(check_point, log_file, learning_rate_drop, learning_rate_patience, tensorboard_log_file):
     callback = []
-    callback.append(ModelCheckpoint(model_file, monitor = 'val_acc', verbose = 1, mode = 'max'))
+    callback.append(ModelCheckpoint(check_point, monitor = 'val_acc', verbose = 1, save_best_only = True, mode = 'max'))
     callback.append(CSVLogger(log_file, append = False))
     callback.append(ReduceLROnPlateau(factor = learning_rate_drop,
                                       patience = learning_rate_patience,
@@ -79,7 +86,7 @@ def train(output_path = output_path,
               y = label_patch,
               batch_size = batch_size,
               epochs = epochs,
-              callbacks = get_callback(model_file = check_point,
+              callbacks = get_callback(check_point = check_point,
                                        log_file = log_file,
                                        learning_rate_drop = learning_rate_drop,
                                        learning_rate_patience = learning_rate_patience
